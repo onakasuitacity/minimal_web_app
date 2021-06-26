@@ -22,7 +22,6 @@ services:
             sh -c "apk --no-cache add gcc build-base linux-headers
             && pip install flask pymysql uwsgi
             && rm -rf /root/.cache/pip
-            && python before_deploy.py
             && uwsgi --ini uwsgi.ini"
         working_dir: /home/app
         tty: true
@@ -37,9 +36,8 @@ services:
         image: mariadb
         container_name: mariadb
         volumes:
+            - ./mariadb/init.d:/docker-entrypoint-initdb.d
             - db_volume:/var/lib/mysql
-        expose:
-            - 3306
         environment:
             - MARIADB_ROOT_PASSWORD
         networks:
