@@ -15,7 +15,7 @@ while True:
         )
         break
     except:
-        print("Couldn't connect to database. trying to reconnect in 3 seconds")
+        print("Couldn't connect to database. trying to reconnect in 3 seconds.")
         sleep(3)
 cursor = connection.cursor()
 
