@@ -1,32 +1,21 @@
 version: '3'
 
 services:
-    reverse-proxy:
+    web:
         image: nginx
         container_name: nginx
         ports:
             - 8080:8080
         volumes:
-            - ./reverse-proxy/conf.d:/etc/nginx/conf.d
-        tty: true
+            - ./web/conf.d:/etc/nginx/conf.d
         depends_on:
             - app
         networks:
             - frontend
     app:
-        image: python:3.9.5-alpine
+        build: ./app
+        image: min_app
         container_name: app
-        volumes:
-            - ./app:/home/app
-        command: >
-            sh -c "apk --no-cache add gcc build-base linux-headers
-            && pip install flask pymysql uwsgi
-            && rm -rf /root/.cache/pip
-            && uwsgi --ini uwsgi.ini"
-        working_dir: /home/app
-        tty: true
-        expose:
-            - 8000
         depends_on:
             - db
         networks:
@@ -36,7 +25,7 @@ services:
         image: mariadb
         container_name: mariadb
         volumes:
-            - ./mariadb/init.d:/docker-entrypoint-initdb.d
+            - ./db/init.d:/docker-entrypoint-initdb.d
             - db_volume:/var/lib/mysql
         environment:
             - MARIADB_ROOT_PASSWORD
