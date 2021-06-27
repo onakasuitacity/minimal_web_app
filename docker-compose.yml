@@ -1,53 +1,22 @@
 version: '3'
 
 services:
-    reverse-proxy:
-        image: jwilder/nginx-proxy:alpine
-        container_name: reverse-proxy
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - /var/run/docker.sock:/tmp/docker.sock:ro
-            - certs:/etc/nginx/certs:ro
-            - nginx-static:/usr/share/nginx/html
-        labels:
-            com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: ''
-        networks:
-            - test
-
-    letsencrypt:
-        image: jrcs/letsencrypt-nginx-proxy-companion
-        container_name: letsencrypt
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-            - certs:/etc/nginx/certs:rw
-            - nginx-static:/usr/share/nginx/html
-            - vhost:/etc/nginx/vhost.d
-        depends_on:
-            - reverse-proxy
-
     web:
         image: nginx
         container_name: nginx
-        # ports:
-        #     - 80:80
         volumes:
             - ./web/conf.d:/etc/nginx/conf.d
-            # - reverse-proxy_nginx-static:/usr/share/nginx/html
-            - nginx-static:/usr/share/nginx/html
+            - reverse-proxy_nginx-static:/usr/share/nginx/html
         environment:
             VIRTUAL_HOST: onakasuitacity.tk
             LETSENCRYPT_HOST: onakasuitacity.tk
-            LETSENCRYPT_EMAIL: rockstarogk@yahoo.co.jp
-            LETSENCRYPT_TEST: "true"
+            LETSENCRYPT_EMAIL: xxx@gmail.com
+            LETSENCRYPT_TEST: "true"  # comment out in production
         depends_on:
-            - letsencrypt
             - app
         networks:
             - frontend
-            # - reverse-proxy_default
-            - test
+            - reverse-proxy_proxy
     app:
         build: ./app
         image: min_app
@@ -70,15 +39,13 @@ services:
 
 volumes:
     db_volume:
-    # reverse-proxy_nginx-static:
-    #     external: true
     certs:
-    nginx-static:
     vhost:
+    reverse-proxy_nginx-static:
+        external: true
 
 networks:
     frontend:
     backend:
-    # reverse-proxy_default:
-    #     external: true
-    test:
+    reverse-proxy_proxy:
+        external: true
