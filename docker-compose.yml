@@ -2,16 +2,18 @@ version: '3'
 
 services:
     web:
-        image: nginx
+        image: nginx:alpine
         container_name: nginx
         volumes:
             - ./web/conf.d:/etc/nginx/conf.d
             - reverse-proxy_nginx-static:/usr/share/nginx/html
         environment:
-            VIRTUAL_HOST: onakasuitacity.tk
-            LETSENCRYPT_HOST: onakasuitacity.tk
+            VIRTUAL_HOST: localhost
+            LETSENCRYPT_HOST: localhost
             LETSENCRYPT_EMAIL: xxx@gmail.com
             LETSENCRYPT_TEST: "true"  # comment out in production
+            HTTPS_METHOD: noredirect  # comment out in production
+            CERT_NAME: default        # comment out in production
         depends_on:
             - app
         networks:
@@ -39,8 +41,6 @@ services:
 
 volumes:
     db_volume:
-    certs:
-    vhost:
     reverse-proxy_nginx-static:
         external: true
 
